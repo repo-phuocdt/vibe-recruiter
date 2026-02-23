@@ -73,6 +73,6 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: 'Vibe Recruiter ${{ github.ref_name }}'
           releaseBody: 'See changelog for details.'
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
