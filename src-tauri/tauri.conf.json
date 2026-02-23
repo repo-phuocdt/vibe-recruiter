@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Vibe Recruiter",
   "version": "0.1.0",
-  "identifier": "com.viberecruiter.app",
+  "identifier": "com.viberecruiter.desktop",
   "build": {
     "frontendDist": "../build",
     "devUrl": "http://localhost:1420",
