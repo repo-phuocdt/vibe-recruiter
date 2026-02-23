@@ -1,5 +1,5 @@
 import { searchSimilar } from './tauri-commands';
-import { settingsStore } from '$lib/stores/settings-store';
+import { settingsStore } from '$lib/stores/settings-store.svelte';
 
 /**
  * Retrieve RAG context for a chat query.

@@ -1,6 +1,6 @@
 import { tool } from 'ai';
 import { z } from 'zod';
-import { settingsStore } from '$lib/stores/settings-store';
+import { settingsStore } from '$lib/stores/settings-store.svelte';
 
 export const searchWeb = tool({
   description:

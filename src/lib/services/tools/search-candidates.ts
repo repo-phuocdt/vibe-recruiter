@@ -1,7 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { searchSimilar } from '../tauri-commands';
-import { settingsStore } from '$lib/stores/settings-store';
+import { settingsStore } from '$lib/stores/settings-store.svelte';
 
 export const searchCandidates = tool({
   description:

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { jobsStore, loadJobs, addJob, removeJob } from '$lib/stores/jobs-store';
+  import { jobsStore, loadJobs, addJob, removeJob } from '$lib/stores/jobs-store.svelte';
   import JobForm from './job-form.svelte';
 
   let showForm = $state(false);

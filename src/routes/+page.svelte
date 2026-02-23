@@ -8,8 +8,8 @@
     selectConversation,
     deleteChat,
     setMessages,
-  } from '$lib/stores/chat-store';
-  import { settingsStore } from '$lib/stores/settings-store';
+  } from '$lib/stores/chat-store.svelte';
+  import { settingsStore } from '$lib/stores/settings-store.svelte';
   import { getProvider } from '$lib/services/ai-client';
   import { createChatManager } from '$lib/services/chat-manager';
 

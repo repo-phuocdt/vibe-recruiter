@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { settingsStore, updateSettings, resetSettings } from '$lib/stores/settings-store';
+  import { settingsStore, updateSettings, resetSettings } from '$lib/stores/settings-store.svelte';
 
   let model = $state(settingsStore.model);
   let theme = $state(settingsStore.theme);

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { uploadCv, processCv } from '$lib/services/tauri-commands';
-  import { settingsStore } from '$lib/stores/settings-store';
+  import { settingsStore } from '$lib/stores/settings-store.svelte';
 
   let {
     candidateId,

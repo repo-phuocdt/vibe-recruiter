@@ -7,7 +7,7 @@
     createNewChat,
     selectConversation,
     deleteChat,
-  } from '$lib/stores/chat-store';
+  } from '$lib/stores/chat-store.svelte';
   import { goto } from '$app/navigation';
 
   $effect(() => {

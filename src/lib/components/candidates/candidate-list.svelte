@@ -6,7 +6,7 @@
     removeCandidate,
     selectCandidateById,
     clearSelection,
-  } from '$lib/stores/candidates-store';
+  } from '$lib/stores/candidates-store.svelte';
   import CandidateCard from './candidate-card.svelte';
   import CvUpload from './cv-upload.svelte';
 

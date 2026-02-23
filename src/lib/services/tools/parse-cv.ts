@@ -1,7 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { processCv } from '../tauri-commands';
-import { settingsStore } from '$lib/stores/settings-store';
+import { settingsStore } from '$lib/stores/settings-store.svelte';
 
 export const parseCv = tool({
   description:
