@@ -1,7 +1,9 @@
 <script lang="ts">
   import { Marked } from 'marked';
   import DOMPurify from 'dompurify';
-  import type { Message } from '$lib/types.js';
+  import type { Message, ToolCallData } from '$lib/types.js';
+  import ToolIndicator from './tool-indicator.svelte';
+  import ToolResult from './tool-result.svelte';
 
   const parser = new Marked({ async: false });
 
@@ -12,6 +14,15 @@
   let htmlContent = $derived(
     DOMPurify.sanitize(parser.parse(message.content) as string)
   );
+
+  let toolCalls = $derived.by(() => {
+    if (!message.tool_calls) return [] as ToolCallData[];
+    try {
+      return JSON.parse(message.tool_calls) as ToolCallData[];
+    } catch {
+      return [] as ToolCallData[];
+    }
+  });
 </script>
 
 <div class="flex {isUser ? 'justify-end' : 'justify-start'} mb-4 px-4">
@@ -24,9 +35,21 @@
     {#if isUser}
       <p class="whitespace-pre-wrap">{message.content}</p>
     {:else}
-      <div class="prose prose-invert prose-sm max-w-none">
-        {@html htmlContent}
-      </div>
+      {#if toolCalls.length > 0}
+        <div class="mb-2 space-y-1">
+          {#each toolCalls as tc, i (i)}
+            <ToolIndicator toolCall={tc} />
+            {#if tc.status === 'complete' || tc.status === 'error'}
+              <ToolResult toolCall={tc} />
+            {/if}
+          {/each}
+        </div>
+      {/if}
+      {#if message.content}
+        <div class="prose prose-invert prose-sm max-w-none">
+          {@html htmlContent}
+        </div>
+      {/if}
     {/if}
   </div>
 </div>

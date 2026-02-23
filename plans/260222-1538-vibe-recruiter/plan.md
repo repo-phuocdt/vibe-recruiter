@@ -37,8 +37,8 @@ Tauri Desktop App
 | # | Phase | Status | Effort | Link |
 |---|-------|--------|--------|------|
 | 1 | Project Setup & Core Chat | Complete | 3w | [phase-01](./phase-01-project-setup-core-chat.md) |
-| 2 | Data Management & RAG | Pending | 3w | [phase-02](./phase-02-data-and-rag.md) |
-| 3 | Agent Tools | Pending | 2w | [phase-03](./phase-03-agent-tools.md) |
+| 2 | Data Management & RAG | Complete | 3w | [phase-02](./phase-02-data-and-rag.md) |
+| 3 | Agent Tools | Complete | 2w | [phase-03](./phase-03-agent-tools.md) |
 | 4 | Dashboard | Pending | 2w | [phase-04](./phase-04-dashboard.md) |
 | 5 | Polish & Launch | Pending | 2w | [phase-05](./phase-05-polish-and-launch.md) |
 

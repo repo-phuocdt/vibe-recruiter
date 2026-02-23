@@ -5,7 +5,7 @@
 - [sqlite-vec](https://github.com/asg017/sqlite-vec) | [pdf-extract](https://crates.io/crates/pdf-extract) | [AI SDK Embeddings](https://ai-sdk.dev/docs/ai-sdk-core/embeddings)
 
 ## Overview
-**P1 | Pending (blocked by Phase 1) | 3 weeks** -- SQLite schema expansion, CV upload + parsing (Rust), embedding pipeline, sqlite-vec vector search, RAG-enhanced chat.
+**P1 | Complete | 3 weeks** -- SQLite schema expansion, CV upload + parsing (Rust), embedding pipeline, sqlite-vec vector search, RAG-enhanced chat.
 
 ## Requirements
 
@@ -181,24 +181,24 @@ proxy/src/index.ts                                    # Add /v1/embeddings route
 
 ## Todo List
 
-- [ ] Extend SQLite schema (candidates, jobs, applications, vec_embeddings)
-- [ ] Add migration versioning system
-- [ ] Implement Candidate model + CRUD Rust commands
-- [ ] Implement Job model + CRUD Rust commands
-- [ ] Setup tauri-plugin-dialog cho file picker
-- [ ] Implement CV upload + file copy to app data dir
-- [ ] Implement PDF text extraction (pdf-extract crate)
-- [ ] Implement LLM structured data extraction from CV text
-- [ ] Add /v1/embeddings proxy route
-- [ ] Implement text chunking algorithm
-- [ ] Implement embedding API client trong Rust
-- [ ] Implement sqlite-vec storage for embeddings
-- [ ] Implement vector search command
-- [ ] Build RAG context retrieval service (frontend)
-- [ ] Integrate RAG context into chat system prompt
-- [ ] Build candidate-list + candidate-card UI
-- [ ] Build cv-upload component
-- [ ] Build job-form + job-list UI
+- [x] Extend SQLite schema (candidates, jobs, applications, vec_embeddings)
+- [x] Add migration versioning system
+- [x] Implement Candidate model + CRUD Rust commands
+- [x] Implement Job model + CRUD Rust commands
+- [x] Setup tauri-plugin-dialog cho file picker
+- [x] Implement CV upload + file copy to app data dir
+- [x] Implement PDF text extraction (pdf-extract crate)
+- [x] Implement LLM structured data extraction from CV text
+- [x] Add /v1/embeddings proxy route
+- [x] Implement text chunking algorithm
+- [x] Implement embedding API client trong Rust
+- [x] Implement sqlite-vec storage for embeddings
+- [x] Implement vector search command
+- [x] Build RAG context retrieval service (frontend)
+- [x] Integrate RAG context into chat system prompt
+- [x] Build candidate-list + candidate-card UI
+- [x] Build cv-upload component
+- [x] Build job-form + job-list UI
 - [ ] Test end-to-end: upload CV -> parse -> embed -> search -> chat with context
 
 ## Success Criteria

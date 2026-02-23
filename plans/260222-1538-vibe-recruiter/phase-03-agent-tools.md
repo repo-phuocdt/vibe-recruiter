@@ -5,7 +5,7 @@
 - [AI SDK Tools](https://ai-sdk.dev/docs/ai-sdk-core/tools-and-tool-calling) | [generateText](https://ai-sdk.dev/docs/ai-sdk-core/generating-text)
 
 ## Overview
-**P1 | Pending (blocked by Phase 2) | 2 weeks** -- Agent orchestrator voi Vercel AI SDK `generateText()`, 6 tool definitions (Zod), execute qua Tauri commands, tool call UI indicators.
+**P1 | Complete | 2 weeks** -- Agent orchestrator voi Vercel AI SDK `streamText()`, 6 tool definitions (Zod), execute qua Tauri commands, tool call UI indicators.
 
 ## Requirements
 
@@ -156,24 +156,24 @@ proxy/src/index.ts                                 # Add /v1/search route (web s
 
 ## Todo List
 
-- [ ] Define Zod schemas for all 6 tools
-- [ ] Implement search_candidates tool (wraps invoke search_similar)
-- [ ] Implement parse_cv tool (wraps invoke upload_and_parse_cv)
-- [ ] Implement rank_candidates tool + Rust rank command
-- [ ] Implement draft_email tool (pure LLM generation)
-- [ ] Implement search_web tool + proxy /v1/search route
-- [ ] Implement generate_report tool + Rust data aggregation command
-- [ ] Create tools/index.ts registry
-- [ ] Build agent orchestrator (generateText + maxSteps)
-- [ ] Write recruiter system prompt
-- [ ] Build tool-indicator.svelte component
-- [ ] Build tool-result.svelte component (collapsible)
-- [ ] Extend message-bubble to render tool calls inline
-- [ ] Wire agent into chat-panel send flow
-- [ ] Add tool_calls column to messages table
-- [ ] Test multi-step agent chain: "find top 5 candidates for Senior React Developer"
-- [ ] Test agent handles tool errors gracefully
-- [ ] Test maxSteps limit prevents infinite loops
+- [x] Define Zod schemas for all 6 tools
+- [x] Implement search_candidates tool (wraps invoke search_similar)
+- [x] Implement parse_cv tool (wraps invoke upload_and_parse_cv)
+- [x] Implement rank_candidates tool + Rust rank command
+- [x] Implement draft_email tool (pure LLM generation)
+- [x] Implement search_web tool + proxy /v1/search route
+- [x] Implement generate_report tool + Rust data aggregation command
+- [x] Create tools/index.ts registry
+- [x] Build agent orchestrator (streamText + maxSteps)
+- [x] Write recruiter system prompt
+- [x] Build tool-indicator.svelte component
+- [x] Build tool-result.svelte component (collapsible)
+- [x] Extend message-bubble to render tool calls inline
+- [x] Wire agent into chat-panel send flow
+- [x] Add tool_calls column to messages table
+- [x] Test multi-step agent chain: "find top 5 candidates for Senior React Developer"
+- [x] Test agent handles tool errors gracefully
+- [x] Test maxSteps limit prevents infinite loops
 
 ## Success Criteria
 - Agent tu dong chon dung tool based on user query

@@ -1,7 +1,7 @@
-import { streamText } from 'ai';
 import type { LanguageModel } from 'ai';
-import type { Message } from '$lib/types';
+import type { Message, ToolCallData } from '$lib/types';
 import { saveMessage } from './tauri-commands';
+import { runAgent } from './agent';
 
 type ChatRole = 'user' | 'assistant' | 'system';
 
@@ -11,9 +11,8 @@ interface StreamMessage {
 }
 
 /**
- * Creates a reactive chat manager wrapping streamText.
- * Replaces useChat — supports tools in future phases.
- * Call inside a Svelte component or module-level runes context.
+ * Creates a reactive chat manager with agent tool support.
+ * Uses streamText + tools with maxSteps for multi-step agent loops.
  */
 export function createChatManager(getModel: () => LanguageModel) {
   let messages = $state<Message[]>([]);
@@ -45,42 +44,85 @@ export function createChatManager(getModel: () => LanguageModel) {
     messages = [...messages, userMsg];
     isLoading = true;
 
-    // Placeholder for streaming assistant response
     const assistantMsg: Message = {
       id: crypto.randomUUID(),
       conversation_id: conversationId ?? '',
       role: 'assistant',
       content: '',
+      tool_calls: null,
       created_at: new Date().toISOString(),
     };
 
     messages = [...messages, assistantMsg];
     const assistantIndex = messages.length - 1;
 
+    // Track tool calls for this response
+    const collectedToolCalls: ToolCallData[] = [];
+
     try {
-      const result = streamText({
+      // RAG context
+      let ragContext: string | undefined;
+      try {
+        const { getRAGContext } = await import('./rag');
+        const ctx = await getRAGContext(input.trim());
+        if (ctx) ragContext = ctx;
+      } catch {
+        // RAG not available
+      }
+
+      const result = runAgent({
+        messages: toStreamMessages(messages.slice(0, -1)),
         model: getModel(),
-        messages: toStreamMessages(messages.slice(0, -1)), // exclude empty assistant placeholder
+        ragContext,
+        callbacks: {
+          onToolCall: (tc) => {
+            collectedToolCalls.push(tc);
+            messages = messages.map((m, i) =>
+              i === assistantIndex
+                ? { ...m, tool_calls: JSON.stringify(collectedToolCalls) }
+                : m
+            );
+          },
+          onToolResult: (toolName, result) => {
+            const idx = collectedToolCalls.findLastIndex(
+              (tc) => tc.toolName === toolName
+            );
+            if (idx >= 0) {
+              collectedToolCalls[idx].result = result;
+              collectedToolCalls[idx].status = 'complete';
+            }
+            messages = messages.map((m, i) =>
+              i === assistantIndex
+                ? { ...m, tool_calls: JSON.stringify(collectedToolCalls) }
+                : m
+            );
+          },
+        },
       });
 
       let fullContent = '';
 
       for await (const delta of result.textStream) {
         fullContent += delta;
-        // Reactive update of the last assistant message
         messages = messages.map((m, i) =>
           i === assistantIndex ? { ...m, content: fullContent } : m
         );
       }
 
-      // Persist to Tauri backend (fire-and-forget errors are swallowed to not break UI)
+      // Persist messages
+      const toolCallsJson =
+        collectedToolCalls.length > 0
+          ? JSON.stringify(collectedToolCalls)
+          : null;
+
       if (conversationId) {
-        await saveMessage(conversationId, 'user', input.trim()).catch(console.error);
-        await saveMessage(conversationId, 'assistant', fullContent).catch(console.error);
+        saveMessage(conversationId, 'user', input.trim()).catch(console.error);
+        saveMessage(conversationId, 'assistant', fullContent, toolCallsJson).catch(
+          console.error
+        );
       }
     } catch (err) {
       error = err instanceof Error ? err.message : 'Unknown error while streaming';
-      // Remove the empty assistant placeholder on failure
       messages = messages.filter((_, i) => i !== assistantIndex);
     } finally {
       isLoading = false;

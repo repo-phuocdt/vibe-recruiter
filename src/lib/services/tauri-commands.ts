@@ -1,4 +1,4 @@
-import type { Conversation, Message } from '$lib/types';
+import type { Conversation, Message, Candidate, Job, SearchResult, RankedCandidate } from '$lib/types';
 
 // Tauri invoke with graceful fallback when running in browser (dev mode)
 async function tauriInvoke<T>(command: string, args?: Record<string, unknown>): Promise<T> {
@@ -29,7 +29,139 @@ export async function getMessages(conversationId: string): Promise<Message[]> {
 export async function saveMessage(
   conversationId: string,
   role: string,
-  content: string
+  content: string,
+  toolCalls?: string | null
 ): Promise<Message> {
-  return tauriInvoke<Message>('save_message', { conversationId, role, content });
+  return tauriInvoke<Message>('save_message', {
+    conversationId,
+    role,
+    content,
+    toolCalls: toolCalls ?? null,
+  });
+}
+
+// --- Candidates ---
+
+export async function createCandidate(
+  name: string,
+  email?: string,
+  phone?: string
+): Promise<Candidate> {
+  return tauriInvoke<Candidate>('create_candidate', {
+    name,
+    email: email ?? null,
+    phone: phone ?? null,
+  });
+}
+
+export async function listCandidates(search?: string): Promise<Candidate[]> {
+  return tauriInvoke<Candidate[]>('list_candidates', { search: search ?? null });
+}
+
+export async function getCandidate(id: string): Promise<Candidate> {
+  return tauriInvoke<Candidate>('get_candidate', { id });
+}
+
+export async function updateCandidate(
+  id: string,
+  name?: string,
+  email?: string,
+  phone?: string
+): Promise<void> {
+  return tauriInvoke<void>('update_candidate', {
+    id,
+    name: name ?? null,
+    email: email ?? null,
+    phone: phone ?? null,
+  });
+}
+
+export async function deleteCandidate(id: string): Promise<void> {
+  return tauriInvoke<void>('delete_candidate', { id });
+}
+
+export async function uploadCv(candidateId: string, filePath: string): Promise<string> {
+  return tauriInvoke<string>('upload_cv', { candidateId, filePath });
+}
+
+export async function processCv(
+  candidateId: string,
+  proxyUrl: string,
+  apiKey: string
+): Promise<string> {
+  return tauriInvoke<string>('process_cv', { candidateId, proxyUrl, apiKey });
+}
+
+// --- Jobs ---
+
+export async function createJob(
+  title: string,
+  description?: string,
+  requirements?: string
+): Promise<Job> {
+  return tauriInvoke<Job>('create_job', {
+    title,
+    description: description ?? null,
+    requirements: requirements ?? null,
+  });
+}
+
+export async function listJobs(statusFilter?: string): Promise<Job[]> {
+  return tauriInvoke<Job[]>('list_jobs', { statusFilter: statusFilter ?? null });
+}
+
+export async function getJob(id: string): Promise<Job> {
+  return tauriInvoke<Job>('get_job', { id });
+}
+
+export async function updateJob(
+  id: string,
+  title?: string,
+  description?: string,
+  requirements?: string,
+  status?: string
+): Promise<void> {
+  return tauriInvoke<void>('update_job', {
+    id,
+    title: title ?? null,
+    description: description ?? null,
+    requirements: requirements ?? null,
+    status: status ?? null,
+  });
+}
+
+export async function deleteJob(id: string): Promise<void> {
+  return tauriInvoke<void>('delete_job', { id });
+}
+
+export async function embedJob(jobId: string, proxyUrl: string, apiKey: string): Promise<void> {
+  return tauriInvoke<void>('embed_job', { jobId, proxyUrl, apiKey });
+}
+
+// --- Embeddings ---
+
+export async function searchSimilar(
+  query: string,
+  topK: number,
+  proxyUrl: string,
+  apiKey: string
+): Promise<SearchResult[]> {
+  return tauriInvoke<SearchResult[]>('search_similar', { query, topK, proxyUrl, apiKey });
+}
+
+// --- Agent tools ---
+
+export async function rankCandidates(
+  jobId: string,
+  topK: number,
+  proxyUrl: string,
+  apiKey: string
+): Promise<RankedCandidate[]> {
+  return tauriInvoke<RankedCandidate[]>('rank_candidates', { jobId, topK, proxyUrl, apiKey });
+}
+
+export async function generateReportData(
+  reportType: string
+): Promise<Record<string, unknown>> {
+  return tauriInvoke<Record<string, unknown>>('generate_report_data', { reportType });
 }

@@ -17,6 +17,26 @@
 </script>
 
 <aside class="flex w-[280px] shrink-0 flex-col border-r border-zinc-800 bg-zinc-950">
+  <!-- Page navigation -->
+  <nav class="flex gap-1 border-b border-zinc-800 p-2">
+    <a
+      href="/"
+      class="flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors hover:bg-zinc-800 hover:text-zinc-100 text-zinc-400"
+    >Chat</a>
+    <a
+      href="/candidates"
+      class="flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors hover:bg-zinc-800 hover:text-zinc-100 text-zinc-400"
+    >Candidates</a>
+    <a
+      href="/jobs"
+      class="flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors hover:bg-zinc-800 hover:text-zinc-100 text-zinc-400"
+    >Jobs</a>
+    <a
+      href="/settings"
+      class="flex-1 rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors hover:bg-zinc-800 hover:text-zinc-100 text-zinc-400"
+    >Settings</a>
+  </nav>
+
   <div class="p-3">
     <button
       onclick={oncreate}

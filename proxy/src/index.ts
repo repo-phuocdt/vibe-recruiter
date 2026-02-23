@@ -10,6 +10,7 @@ export interface Env {
   PROXY_API_KEY: string;
   OPENAI_API_KEY: string;
   ANTHROPIC_API_KEY: string;
+  SERPER_API_KEY: string;
   ENVIRONMENT: string;
 }
 
@@ -39,6 +40,77 @@ app.get('/health', (c) => {
 // Protected routes
 app.use('/v1/*', authMiddleware);
 app.use('/v1/*', rateLimiter);
+
+// Embeddings proxy (forward to OpenAI)
+app.post('/v1/embeddings', async (c) => {
+  let body: Record<string, unknown>;
+  try {
+    body = await c.req.json<Record<string, unknown>>();
+  } catch {
+    return c.json({ error: 'Invalid JSON body' }, 400);
+  }
+
+  if (!c.env.OPENAI_API_KEY) {
+    return c.json({ error: 'OPENAI_API_KEY not configured' }, 500);
+  }
+
+  const upstream = await fetch('https://api.openai.com/v1/embeddings', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${c.env.OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  return new Response(upstream.body, {
+    status: upstream.status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+});
+
+// Web search proxy (Serper.dev)
+app.post('/v1/search', async (c) => {
+  let body: Record<string, unknown>;
+  try {
+    body = await c.req.json<Record<string, unknown>>();
+  } catch {
+    return c.json({ error: 'Invalid JSON body' }, 400);
+  }
+
+  const query = typeof body.query === 'string' ? body.query.slice(0, 500) : '';
+  if (!query) {
+    return c.json({ error: 'Missing query parameter' }, 400);
+  }
+
+  if (!c.env.SERPER_API_KEY) {
+    return c.json({ error: 'SERPER_API_KEY not configured' }, 500);
+  }
+
+  const upstream = await fetch('https://google.serper.dev/search', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-KEY': c.env.SERPER_API_KEY,
+    },
+    body: JSON.stringify({ q: query, num: 5 }),
+  });
+
+  if (!upstream.ok) {
+    const text = await upstream.text();
+    return c.json({ error: `Serper API error: ${text}` }, upstream.status as 400);
+  }
+
+  const data = (await upstream.json()) as Record<string, unknown>;
+  const organic = Array.isArray(data.organic) ? data.organic : [];
+  const results = (organic as Array<Record<string, unknown>>).slice(0, 5).map((r) => ({
+    title: r.title,
+    link: r.link,
+    snippet: r.snippet,
+  }));
+
+  return c.json({ results });
+});
 
 // Chat completions proxy
 app.post('/v1/chat/completions', async (c) => {

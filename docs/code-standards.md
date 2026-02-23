@@ -26,6 +26,10 @@ let activeConversation = $derived(
 let effect = $effect(() => {
   console.log('Messages changed:', messages.length);
 });
+
+// Tool call state tracking (Phase 3)
+let toolCalls = $state<ToolCallData[]>([]);
+let activeToolIndex = $state<number | null>(null);
 ```
 
 ### Props with Runes
@@ -210,15 +214,83 @@ import type { MyType } from '$lib/types';
 import { helper } from './helper';
 ```
 
+## Tool Definition Standards (Phase 3)
+
+### Tool Structure
+```typescript
+import { z } from 'zod';
+
+// Define Zod schema for input validation
+const searchCandidatesSchema = z.object({
+  query: z.string().describe('Search query (skills, experience, name)'),
+  limit: z.number().optional().describe('Max results (default 10)'),
+});
+
+// Export tool with description & execute function
+export const searchCandidates = {
+  description: 'Search candidates by skills or experience',
+  inputSchema: searchCandidatesSchema,
+  execute: async (input: z.infer<typeof searchCandidatesSchema>) => {
+    // Validate via Zod (done automatically by agent)
+    // Call Tauri command
+    const results = await invokeTauriCommand('rank_candidates', { ... });
+    // Return formatted results
+    return results;
+  },
+};
+```
+
 ## Testing & Debugging
 
 - Use browser DevTools for frontend debugging
 - Use Rust's `dbg!()` macro for backend inspection
 - Log important state transitions in stores
 - Avoid logging sensitive data (API keys, auth tokens)
+- Test tool input validation with Zod schemas before execution (Phase 3)
+
+## AI SDK v6 API Changes (Phase 3)
+
+### Tool Definition (AI SDK v6)
+```typescript
+// ✅ Use inputSchema instead of parameters
+const toolDef = {
+  description: 'Tool description',
+  inputSchema: z.object({ param: z.string() }), // AI SDK v6
+  execute: async (input) => { /* ... */ },
+};
+
+// ❌ Don't use parameters (AI SDK v5)
+// const toolDef = {
+//   parameters: z.object({ ... }), // Old API
+// };
+```
+
+### Agent Loop Control (AI SDK v6)
+```typescript
+// ✅ Use stepCountIs for max steps
+const result = streamText({
+  model,
+  tools: allTools,
+  stopWhen: (state) => stepCountIs(10, state), // AI SDK v6
+});
+
+// ❌ Don't use maxSteps directly (varies by SDK version)
+// const result = streamText({ ..., maxSteps: 10 }); // Old API
+```
+
+### Message Types (AI SDK v6)
+```typescript
+// ✅ Use ModelMessage for agent/streaming
+import type { ModelMessage } from 'ai';
+const messages: ModelMessage[] = [...];
+
+// ❌ Don't use CoreMessage for agentic flows
+// import type { CoreMessage } from 'ai'; // Use for non-agent flows
+```
 
 ## Version Control
 
 - Commit messages follow conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`
 - Don't commit `.env` or configuration files with secrets
 - Keep commits focused on single feature/fix
+- Phase 3 commits reference AI SDK v6+ tool calling capability

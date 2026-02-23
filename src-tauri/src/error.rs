@@ -8,6 +8,12 @@ pub enum AppError {
 
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
+
+    #[error("Request error: {0}")]
+    Request(String),
+
+    #[error("Parse error: {0}")]
+    Parse(String),
 }
 
 impl Serialize for AppError {

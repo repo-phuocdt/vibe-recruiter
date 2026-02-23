@@ -36,9 +36,11 @@
     "@ai-sdk/openai": "^3.0.30",
     "@ai-sdk/svelte": "^4.0.97",
     "@tauri-apps/api": "^2.10.1",
+    "@tauri-apps/plugin-dialog": "^2.6.0",
     "@tauri-apps/plugin-shell": "^2.3.5",
     "ai": "^6.0.97",
     "dompurify": "^3.3.1",
-    "marked": "^17.0.3"
+    "marked": "^17.0.3",
+    "zod": "^4.3.6"
   }
 }

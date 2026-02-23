@@ -46,10 +46,18 @@ vibe-recruiter/
 - `chat/message-list.svelte` - Scrollable message history
 - `chat/chat-input.svelte` - User message input field
 - `chat/message-bubble.svelte` - Individual message rendering with markdown
+- `chat/tool-indicator.svelte` - Tool execution status indicator (Phase 3)
+- `chat/tool-result.svelte` - Expandable tool result display (Phase 3)
 
 **Layout Module:**
 - `layout/app-layout.svelte` - Main app layout (sidebar + content area)
 - `layout/sidebar.svelte` - Conversation list & navigation
+
+**Candidates Module (Phase 3):**
+- `candidates/` - Candidate management components
+
+**Jobs Module (Phase 3):**
+- `jobs/` - Job listing components
 
 ### Stores (lib/stores/)
 | File | Purpose |
@@ -61,8 +69,19 @@ vibe-recruiter/
 | File | Purpose |
 |------|---------|
 | `ai-client.ts` | LLM provider factory (OpenAI/Claude/Ollama) |
-| `chat-manager.ts` | Streaming chat logic with `streamText` |
+| `agent.ts` | Agent orchestrator with tool calling (streamText + tools) |
+| `chat-manager.ts` | Streaming chat logic with agent & tool support |
 | `tauri-commands.ts` | Tauri command invocations wrapper |
+| `rag.ts` | RAG context generation for agent |
+
+**Tools (lib/services/tools/):**
+- `index.ts` - Tool registry with all 6 tools
+- `search-candidates.ts` - Vector similarity search for candidates
+- `parse-cv.ts` - Extract structured data from CVs
+- `rank-candidates.ts` - Rank candidates by relevance
+- `draft-email.ts` - Generate recruitment emails
+- `search-web.ts` - Serper.dev web search integration
+- `generate-report.ts` - Pipeline stats & summaries
 
 ### Type Definitions
 | File | Purpose |
@@ -76,15 +95,22 @@ vibe-recruiter/
 | File | Purpose |
 |------|---------|
 | `commands/conversations.rs` | CRUD operations for conversations & messages |
+| `commands/candidates.rs` | Candidate ranking & management (Phase 3) |
+| `commands/jobs.rs` | Job management & report generation (Phase 3) |
+| `commands/embeddings.rs` | Vector embedding operations (Phase 3) |
 | `commands/mod.rs` | Command module exports |
 
-**Exported Commands:**
+**Exported Commands (Phase 1):**
 - `create_conversation(title) → Conversation`
 - `list_conversations() → Vec<Conversation>`
 - `rename_conversation(id, title) → ()`
 - `delete_conversation(id) → ()`
 - `get_messages(conversation_id) → Vec<Message>`
-- `save_message(conversation_id, role, content) → Message`
+- `save_message(conversation_id, role, content, tool_calls?) → Message`
+
+**Exported Commands (Phase 3):**
+- `rank_candidates(job_id, candidate_ids) → Vec<RankedCandidate>`
+- `generate_report_data(job_id) → ReportData`
 
 ### Database Module (db/)
 | File | Purpose |
@@ -94,8 +120,12 @@ vibe-recruiter/
 
 **Tables Created:**
 - `conversations` - Chat session metadata
-- `messages` - Message history
+- `messages` - Message history + tool_calls JSON (Phase 3)
 - `settings` - Key-value settings (reserved for future)
+- `candidates` - Parsed CV data (Phase 3)
+- `jobs` - Job listings (Phase 3)
+- `embeddings` - Vector store for semantic search (Phase 3)
+- `applications` - Candidate-to-job applications (Phase 3)
 
 ### Error Handling
 | File | Purpose |
@@ -108,9 +138,13 @@ vibe-recruiter/
 
 | File | Purpose |
 |------|---------|
-| `index.ts` | Hono app with routes & model routing |
+| `index.ts` | Hono app with routes & model routing + web search (Phase 3) |
 | `auth-middleware.ts` | Bearer token validation (constant-time) |
 | `rate-limiter.ts` | KV-based rate limiting (60 req/min) |
+
+**Routes (Phase 3):**
+- `POST /v1/chat/completions` - Chat completion with model routing
+- `POST /v1/search` - Serper.dev web search integration (requires SERPER_API_KEY)
 
 ## Configuration Files
 
@@ -132,7 +166,8 @@ svelte                - Svelte 5 (runes)
 @ai-sdk/openai        - OpenAI provider
 @ai-sdk/anthropic     - Claude provider
 @ai-sdk/svelte        - Svelte bindings for AI SDK
-ai                    - Vercel AI library (streamText)
+ai                    - Vercel AI SDK v6+ (streamText + tools)
+zod                   - Schema validation v4 (tool inputSchema)
 @tauri-apps/api       - Tauri frontend bridge
 dompurify             - HTML sanitization
 marked                - Markdown parser
@@ -165,23 +200,35 @@ hono                  - Web framework
 5. Returns `Conversation` object, updates reactive store
 6. UI re-renders with new conversation in sidebar
 
-### Message Sending
+### Message Sending with Tools (Phase 3)
 1. User types message, clicks send in `chat-input.svelte`
 2. `createChatManager.send()` invoked with message text
 3. User message added to `$state`, placeholder assistant message created
-4. `streamText()` called with LLM provider
-5. Makes POST to `/v1/chat/completions` via proxy
-6. Proxy validates auth, rate limit, routes to OpenAI/Anthropic/Ollama
-7. Stream response updates reactive state in real-time
-8. After stream completes, `save_message()` persists to SQLite
+4. `runAgent()` called (agent.ts) with messages + tools
+5. `streamText()` executes with `allTools` registry
+6. Makes POST to `/v1/chat/completions` via proxy
+7. Agent may invoke tools (up to 10 steps via stepCountIs)
+8. Tool results stored as JSON in message.tool_calls
+9. Stream response updates reactive state in real-time
+10. After stream completes, `save_message()` persists with tool_calls to SQLite
+
+### Tool Execution Flow
+1. Agent decides to call tool (e.g., `searchCandidates`)
+2. Tool receives typed arguments (validated by Zod schema)
+3. Tool invokes Tauri command (e.g., `rank_candidates`)
+4. Rust backend queries vector store, returns results
+5. Tool formats results, returns to agent
+6. Agent incorporates results into response
+7. Tool indicator shows execution status to user
+8. Tool result expandable in UI for inspection
 
 ### Message Loading
 1. User clicks conversation in sidebar
 2. `selectConversation(id)` called
 3. Invokes Tauri command `get_messages(id)`
-4. Rust queries SQLite, returns `Vec<Message>`
+4. Rust queries SQLite, returns `Vec<Message>` with tool_calls
 5. `chat-manager.loadMessages()` updates reactive state
-6. Message list re-renders with history
+6. Message list re-renders with history + tool results
 
 ## Naming Conventions Applied
 
