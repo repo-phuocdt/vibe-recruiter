@@ -35,7 +35,12 @@ vibe-recruiter/
 | File | Purpose |
 |------|---------|
 | `routes/+page.svelte` | Home page (chat interface) |
-| `routes/+layout.svelte` | Root layout wrapper |
+| `routes/+layout.svelte` | Root layout wrapper with sidebar-nav |
+| `routes/dashboard/+page.svelte` | Dashboard overview with stats & pipeline board (Phase 4) |
+| `routes/candidates/+page.svelte` | Candidates list page |
+| `routes/candidates/[id]/+page.svelte` | Candidate detail page (Phase 4) |
+| `routes/jobs/+page.svelte` | Jobs list page |
+| `routes/jobs/[id]/+page.svelte` | Job detail page (Phase 4) |
 | `routes/settings/+page.svelte` | Settings page |
 | `routes/+layout.ts` | Layout data loading |
 
@@ -52,6 +57,16 @@ vibe-recruiter/
 **Layout Module:**
 - `layout/app-layout.svelte` - Main app layout (sidebar + content area)
 - `layout/sidebar.svelte` - Conversation list & navigation
+- `layout/sidebar-nav.svelte` - Navigation bar with route links (Phase 4)
+
+**Dashboard Module (Phase 4):**
+- `dashboard/stats-cards.svelte` - Key metrics display (total candidates, jobs, applications, hired)
+- `dashboard/candidate-pipeline-card.svelte` - Individual candidate card with drag-drop support
+- `dashboard/pipeline-board.svelte` - Kanban-style board with 6 stages (new, screening, interview, offer, hired, rejected)
+- `dashboard/simple-bar-chart.svelte` - Bar chart for analytics visualization
+
+**Analytics Module (Phase 4):**
+- `analytics/simple-bar-chart.svelte` - Reusable bar chart component
 
 **Candidates Module (Phase 3):**
 - `candidates/` - Candidate management components
@@ -62,8 +77,11 @@ vibe-recruiter/
 ### Stores (lib/stores/)
 | File | Purpose |
 |------|---------|
-| `chat-store.ts` | Conversation & message state (Svelte 5 runes) |
-| `settings-store.ts` | User settings persistence (localStorage) |
+| `chat-store.svelte.ts` | Conversation & message state (Svelte 5 runes) |
+| `settings-store.svelte.ts` | User settings persistence (localStorage) |
+| `candidates-store.svelte.ts` | Candidate state management (Phase 3) |
+| `jobs-store.svelte.ts` | Job listings state (Phase 3) |
+| `dashboard-store.svelte.ts` | Dashboard UI state with optimistic updates for pipeline management (Phase 4) |
 
 ### Services (lib/services/)
 | File | Purpose |
@@ -98,6 +116,7 @@ vibe-recruiter/
 | `commands/candidates.rs` | Candidate ranking & management (Phase 3) |
 | `commands/jobs.rs` | Job management & report generation (Phase 3) |
 | `commands/embeddings.rs` | Vector embedding operations (Phase 3) |
+| `commands/analytics.rs` | Dashboard stats, pipeline management & analytics (Phase 4) |
 | `commands/mod.rs` | Command module exports |
 
 **Exported Commands (Phase 1):**
@@ -112,6 +131,14 @@ vibe-recruiter/
 - `rank_candidates(job_id, candidate_ids) → Vec<RankedCandidate>`
 - `generate_report_data(job_id) → ReportData`
 
+**Exported Commands (Phase 4):**
+- `get_dashboard_stats() → DashboardStats` - Total candidates, active jobs, applications, pipeline distribution, hired count
+- `get_pipeline_candidates(stage?) → Vec<PipelineCandidate>` - Filter candidates by stage or list all
+- `update_candidate_stage(application_id, new_stage) → ()` - Move candidate through pipeline (validates against 6 valid stages)
+- `get_analytics_data() → AnalyticsData` - Aggregated metrics: candidates per job, stage distribution
+- `create_application(candidate_id, job_id) → String` - Create new application, returns ID
+- `get_job_applications(job_id) → Vec<PipelineCandidate>` - List all candidates applied to a job
+
 ### Database Module (db/)
 | File | Purpose |
 |------|---------|
@@ -124,8 +151,13 @@ vibe-recruiter/
 - `settings` - Key-value settings (reserved for future)
 - `candidates` - Parsed CV data (Phase 3)
 - `jobs` - Job listings (Phase 3)
-- `embeddings` - Vector store for semantic search (Phase 3)
+- `embedding_chunks` - Vector store for semantic search (Phase 3)
 - `applications` - Candidate-to-job applications (Phase 3)
+
+**Indexes Created (Phase 4 - Migration 4):**
+- `idx_applications_status` - Fast queries by application status
+- `idx_applications_job_id` - Fast queries by job
+- `idx_applications_candidate_id` - Fast queries by candidate
 
 ### Error Handling
 | File | Purpose |
@@ -172,6 +204,8 @@ zod                   - Schema validation v4 (tool inputSchema)
 dompurify             - HTML sanitization
 marked                - Markdown parser
 tailwindcss           - CSS framework v4
+lucide-svelte         - Icon library (Phase 4)
+svelte-dnd-action     - Drag-and-drop for pipeline board (Phase 4)
 ```
 
 ### Backend (Cargo.toml)

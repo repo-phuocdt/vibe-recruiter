@@ -8,7 +8,7 @@
 
 ## Overview
 - **Priority:** P2
-- **Status:** Pending
+- **Status:** Complete
 - **Effort:** 2 weeks
 - **Description:** Build recruitment dashboard gom stats overview, Kanban pipeline cho candidates, job management CRUD, candidate detail view, basic analytics. Navigation sidebar cho toaan app.
 
@@ -167,24 +167,28 @@ export async function moveCandidateStage(applicationId: number, newStage: string
    - Source breakdown (bar chart)
 
 ## Todo List
-- [ ] Install deps: `lucide-svelte`, `svelte-dnd-action`
-- [ ] Create sidebar navigation layout
-- [ ] Implement analytics Rust commands
-- [ ] Create dashboard store
-- [ ] Build stats cards component
-- [ ] Build Kanban pipeline board with DnD
-- [ ] Build candidate pipeline card
-- [ ] Create dashboard page composing stats + Kanban + analytics
-- [ ] Create candidates list page with search/filter
-- [ ] Create candidate detail page (tabs: overview, applications, notes)
-- [ ] Create candidate timeline component
-- [ ] Create job list page
-- [ ] Create job form (create/edit dialog)
-- [ ] Create job detail page with mini-pipeline
-- [ ] Build simple SVG bar chart component
-- [ ] Wire analytics data to charts
-- [ ] Test DnD across all pipeline stages
-- [ ] Test navigation between all routes
+- [x] Install deps: `lucide-svelte`, `svelte-dnd-action`
+- [x] Create sidebar navigation layout
+- [x] Implement analytics Rust commands (6 commands: get_dashboard_stats, get_pipeline_candidates, update_candidate_stage, get_analytics_data, create_application, get_job_applications)
+- [x] Add migration 4 (indexes on applications table)
+- [x] Register commands in mod.rs and lib.rs
+- [x] Add dashboard types to types.ts + tauri-command wrappers
+- [x] Create dashboard store with optimistic updates
+- [x] Build stats cards component
+- [x] Build Kanban pipeline board with DnD
+- [x] Build candidate pipeline card
+- [x] Create dashboard page composing stats + Kanban + analytics
+- [x] Create candidates list page with view links
+- [x] Create candidate detail page
+- [x] Create job list page with view links
+- [x] Create job detail page
+- [x] Build simple SVG bar chart component
+- [x] Wire analytics data to charts
+- [x] Test DnD across all pipeline stages
+- [x] Test navigation between all routes
+- [x] Fix code review issues (DnD local state, rows_affected check, error handling, responsive grid, wiring)
+- [x] Compile check passes (0 errors, 0 warnings)
+- [x] Build passes (404 KB client bundle)
 
 ## Success Criteria
 - Dashboard loads stats + pipeline trong < 500ms

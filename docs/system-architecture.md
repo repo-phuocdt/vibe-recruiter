@@ -11,9 +11,11 @@
 │  │  Frontend (SvelteKit SPA)                            ││
 │  │  ├─ Chat UI (Claude-style) + Agent Tools            ││
 │  │  ├─ Tool Indicator & Results (Phase 3)              ││
+│  │  ├─ Recruitment Dashboard (Phase 4)                 ││
+│  │  ├─ Pipeline Kanban Board with Drag-Drop (Phase 4)  ││
 │  │  ├─ Candidates/Jobs Management (Phase 3)            ││
 │  │  ├─ Settings Page                                    ││
-│  │  └─ Stores (chat-store, settings-store)             ││
+│  │  └─ Stores (chat, settings, dashboard, etc.)        ││
 │  │     Powered by Svelte 5 Runes                        ││
 │  └──────────────────────────────────────────────────────┘│
 │                          ↓                                │
@@ -35,7 +37,8 @@
 │  │  │  ├─ Conversations: CRUD + save_message           ││
 │  │  │  ├─ Candidates: rank_candidates (Phase 3)        ││
 │  │  │  ├─ Jobs: generate_report_data (Phase 3)         ││
-│  │  │  └─ Embeddings: vector search ops (Phase 3)      ││
+│  │  │  ├─ Embeddings: vector search ops (Phase 3)      ││
+│  │  │  └─ Analytics: dashboard stats & pipeline mgt (Phase 4) ││
 │  │  └─ Connection Pool (Mutex<Connection>)              ││
 │  └──────────────────────────────────────────────────────┘│
 │                                                            │
@@ -77,12 +80,18 @@
 - `tool-result.svelte` - Expandable tool result display (Phase 3)
 - `app-layout.svelte` - Main layout (sidebar + content)
 - `sidebar.svelte` - Conversation list and navigation
+- `sidebar-nav.svelte` - Top navigation with route links (Phase 4)
+- `stats-cards.svelte` - Dashboard metrics display (Phase 4)
+- `pipeline-board.svelte` - Kanban-style board with 6 stages & drag-drop (Phase 4)
+- `candidate-pipeline-card.svelte` - Individual candidate card in pipeline (Phase 4)
+- `simple-bar-chart.svelte` - Bar chart for analytics visualization (Phase 4)
 
 **Stores (Svelte 5 Runes):**
-- `chat-store.ts` - Reactive state for conversations & messages
-- `settings-store.ts` - User settings (model, theme, API config)
-- `candidates-store.ts` - Candidate state management (Phase 3)
-- `jobs-store.ts` - Job listings state (Phase 3)
+- `chat-store.svelte.ts` - Reactive state for conversations & messages
+- `settings-store.svelte.ts` - User settings (model, theme, API config)
+- `candidates-store.svelte.ts` - Candidate state management (Phase 3)
+- `jobs-store.svelte.ts` - Job listings state (Phase 3)
+- `dashboard-store.svelte.ts` - Dashboard UI state with optimistic updates for drag-drop pipeline (Phase 4)
 
 **Services:**
 - `ai-client.ts` - LLM provider factory (OpenAI-compatible)
@@ -109,9 +118,10 @@
 
 **Migrations:** `src-tauri/src/db/migrations.rs`
 - Version-based migration system
-- Creates Phase 1 tables: conversations, messages, settings
-- Creates Phase 3 tables: candidates, jobs, embeddings, applications
-- Adds tool_calls TEXT column to messages (Phase 3)
+- Migration 1: Phase 1 tables (conversations, messages, settings)
+- Migration 2: Phase 3 tables (candidates, jobs, applications, embedding_chunks)
+- Migration 3: Phase 3 tool_calls TEXT column on messages
+- Migration 4: Phase 4 indexes on applications table (status, job_id, candidate_id) for query performance
 - Enforces foreign key constraints
 
 **Commands:**
@@ -119,6 +129,7 @@
 - `commands/candidates.rs` - Candidate ranking & data ops (Phase 3)
 - `commands/jobs.rs` - Job reports & analytics (Phase 3)
 - `commands/embeddings.rs` - Vector search operations (Phase 3)
+- `commands/analytics.rs` - Dashboard stats (6 commands for metrics, pipeline, analytics) (Phase 4)
 
 All commands return `Result<T, AppError>` for error handling, parameters validated via Rust's type system, responses serialized to JSON.
 
@@ -268,5 +279,6 @@ Message list rendered in UI
 ## Future Extensibility
 
 - **Phase 2 (RAG)**: ~~Add embeddings table~~ Done in Phase 3
-- **Phase 4 (Dashboard)**: Expand candidate/job routes, add analytics views
-- **Phase 5 (RAG)**: Document ingestion pipeline for CV/JD processing
+- **Phase 4 (Dashboard)**: ~~Expand candidate/job routes, add analytics views~~ Completed
+- **Phase 5**: Document ingestion pipeline for CV/JD processing, enhanced RAG retrieval
+- **Phase 6+**: Bulk operations, advanced filtering, interview scheduling, email templates

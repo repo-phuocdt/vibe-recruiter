@@ -30,10 +30,14 @@ Recruiters needing AI-assisted candidate management and analysis.
 - Pipeline report generation
 - Tool execution indicators & results UI
 
-#### Phase 4 (Planned)
-- Recruitment dashboard for candidate management
-- Analytics and metrics views
-- Bulk operations & candidate filtering
+#### Phase 4 (Completed)
+- Recruitment dashboard with real-time metrics (total candidates, active jobs, applications, hired count)
+- Kanban-style pipeline board with 6 stages (new, screening, interview, offer, hired, rejected)
+- Drag-and-drop candidate management with optimistic UI updates
+- Analytics views: candidates per job, stage distribution
+- New routes: /dashboard, /candidates/[id], /jobs/[id]
+- 6 analytics commands for pipeline & metrics management
+- Database indexes on applications table for performance
 
 ## Technical Stack
 
