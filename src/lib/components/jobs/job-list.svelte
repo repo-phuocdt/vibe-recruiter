@@ -73,6 +73,10 @@
             <p class="mt-1 text-xs text-zinc-500">Requirements: {job.requirements}</p>
           {/if}
           <div class="mt-3 flex gap-2">
+            <a
+              href="/jobs/{job.id}"
+              class="rounded px-2 py-1 text-xs text-zinc-400 hover:text-blue-400"
+            >View</a>
             <button
               onclick={() => removeJob(job.id)}
               class="rounded px-2 py-1 text-xs text-zinc-500 hover:text-red-400"

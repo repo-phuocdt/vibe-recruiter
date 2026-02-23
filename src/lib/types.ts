@@ -59,3 +59,40 @@ export interface SearchResult {
   chunk_text: string;
   score: number;
 }
+
+// --- Dashboard & Analytics ---
+
+export interface StageCount {
+  stage: string;
+  count: number;
+}
+
+export interface DashboardStats {
+  total_candidates: number;
+  active_jobs: number;
+  total_applications: number;
+  pipeline_counts: StageCount[];
+  hired_count: number;
+}
+
+export interface PipelineCandidate {
+  application_id: string;
+  candidate_id: string;
+  candidate_name: string;
+  candidate_email: string | null;
+  job_id: string;
+  job_title: string;
+  stage: string;
+  created_at: string;
+}
+
+export interface AnalyticsData {
+  candidates_per_job: { job_title: string; count: number }[];
+  stage_distribution: StageCount[];
+}
+
+export type PipelineStage = 'new' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected';
+
+export const PIPELINE_STAGES: PipelineStage[] = [
+  'new', 'screening', 'interview', 'offer', 'hired', 'rejected',
+];

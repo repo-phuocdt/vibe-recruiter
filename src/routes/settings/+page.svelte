@@ -1,4 +1,5 @@
 <script lang="ts">
+  import AppLayout from '$lib/components/layout/app-layout.svelte';
   import { settingsStore, updateSettings, resetSettings } from '$lib/stores/settings-store.svelte';
 
   let model = $state(settingsStore.model);
@@ -33,96 +34,87 @@
   }
 </script>
 
-<div class="mx-auto max-w-2xl p-8">
-  <div class="mb-8 flex items-center justify-between">
-    <h1 class="text-2xl font-bold text-zinc-100">Settings</h1>
-    <a href="/" class="rounded-lg bg-zinc-800 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-700">
-      Back to Chat
-    </a>
-  </div>
+<AppLayout>
+  <div class="mx-auto max-w-2xl p-8">
+    <h1 class="mb-8 text-2xl font-bold text-zinc-100">Settings</h1>
 
-  <div class="space-y-6">
-    <!-- Model -->
-    <div>
-      <label for="model" class="mb-2 block text-sm font-medium text-zinc-300">AI Model</label>
-      <select
-        id="model"
-        bind:value={model}
-        class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-zinc-100 focus:border-blue-500 focus:outline-none"
-      >
-        {#each models as m}
-          <option value={m.value}>{m.label}</option>
-        {/each}
-      </select>
-    </div>
+    <div class="space-y-6">
+      <div>
+        <label for="model" class="mb-2 block text-sm font-medium text-zinc-300">AI Model</label>
+        <select
+          id="model"
+          bind:value={model}
+          class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-zinc-100 focus:border-blue-500 focus:outline-none"
+        >
+          {#each models as m}
+            <option value={m.value}>{m.label}</option>
+          {/each}
+        </select>
+      </div>
 
-    <!-- Theme -->
-    <div>
-      <label for="theme" class="mb-2 block text-sm font-medium text-zinc-300">Theme</label>
-      <select
-        id="theme"
-        bind:value={theme}
-        class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-zinc-100 focus:border-blue-500 focus:outline-none"
-      >
-        <option value="dark">Dark</option>
-        <option value="light">Light</option>
-        <option value="system">System</option>
-      </select>
-    </div>
+      <div>
+        <label for="theme" class="mb-2 block text-sm font-medium text-zinc-300">Theme</label>
+        <select
+          id="theme"
+          bind:value={theme}
+          class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-zinc-100 focus:border-blue-500 focus:outline-none"
+        >
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+          <option value="system">System</option>
+        </select>
+      </div>
 
-    <!-- Proxy URL -->
-    <div>
-      <label for="proxy" class="mb-2 block text-sm font-medium text-zinc-300">Proxy URL</label>
-      <input
-        id="proxy"
-        type="url"
-        bind:value={proxyUrl}
-        class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-zinc-100 placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
-        placeholder="http://localhost:8787"
-      />
-    </div>
+      <div>
+        <label for="proxy" class="mb-2 block text-sm font-medium text-zinc-300">Proxy URL</label>
+        <input
+          id="proxy"
+          type="url"
+          bind:value={proxyUrl}
+          class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-zinc-100 placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
+          placeholder="http://localhost:8787"
+        />
+      </div>
 
-    <!-- Proxy API Key -->
-    <div>
-      <label for="apikey" class="mb-2 block text-sm font-medium text-zinc-300">Proxy API Key</label>
-      <input
-        id="apikey"
-        type="password"
-        bind:value={proxyApiKey}
-        class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-zinc-100 placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
-        placeholder="Enter your proxy API key"
-      />
-    </div>
+      <div>
+        <label for="apikey" class="mb-2 block text-sm font-medium text-zinc-300">Proxy API Key</label>
+        <input
+          id="apikey"
+          type="password"
+          bind:value={proxyApiKey}
+          class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-zinc-100 placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
+          placeholder="Enter your proxy API key"
+        />
+      </div>
 
-    <!-- Ollama URL -->
-    <div>
-      <label for="ollama" class="mb-2 block text-sm font-medium text-zinc-300">Ollama URL</label>
-      <input
-        id="ollama"
-        type="url"
-        bind:value={ollamaUrl}
-        class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-zinc-100 placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
-        placeholder="http://localhost:11434"
-      />
-    </div>
+      <div>
+        <label for="ollama" class="mb-2 block text-sm font-medium text-zinc-300">Ollama URL</label>
+        <input
+          id="ollama"
+          type="url"
+          bind:value={ollamaUrl}
+          class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-zinc-100 placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
+          placeholder="http://localhost:11434"
+        />
+      </div>
 
-    <!-- Actions -->
-    <div class="flex items-center gap-4 pt-4">
-      <button
-        onclick={handleSave}
-        class="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
-      >
-        Save Settings
-      </button>
-      <button
-        onclick={handleReset}
-        class="rounded-lg bg-zinc-700 px-6 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-600"
-      >
-        Reset to Defaults
-      </button>
-      {#if saved}
-        <span class="text-sm text-green-400">Saved!</span>
-      {/if}
+      <div class="flex items-center gap-4 pt-4">
+        <button
+          onclick={handleSave}
+          class="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Save Settings
+        </button>
+        <button
+          onclick={handleReset}
+          class="rounded-lg bg-zinc-700 px-6 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-600"
+        >
+          Reset to Defaults
+        </button>
+        {#if saved}
+          <span class="text-sm text-green-400">Saved!</span>
+        {/if}
+      </div>
     </div>
   </div>
-</div>
+</AppLayout>

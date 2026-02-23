@@ -1,4 +1,7 @@
-import type { Conversation, Message, Candidate, Job, SearchResult, RankedCandidate } from '$lib/types';
+import type {
+  Conversation, Message, Candidate, Job, SearchResult, RankedCandidate,
+  DashboardStats, PipelineCandidate, AnalyticsData,
+} from '$lib/types';
 
 // Tauri invoke with graceful fallback when running in browser (dev mode)
 async function tauriInvoke<T>(command: string, args?: Record<string, unknown>): Promise<T> {
@@ -164,4 +167,38 @@ export async function generateReportData(
   reportType: string
 ): Promise<Record<string, unknown>> {
   return tauriInvoke<Record<string, unknown>>('generate_report_data', { reportType });
+}
+
+// --- Analytics / Dashboard ---
+
+export async function getDashboardStats(): Promise<DashboardStats> {
+  return tauriInvoke<DashboardStats>('get_dashboard_stats');
+}
+
+export async function getPipelineCandidates(stage?: string): Promise<PipelineCandidate[]> {
+  return tauriInvoke<PipelineCandidate[]>('get_pipeline_candidates', {
+    stage: stage ?? null,
+  });
+}
+
+export async function updateCandidateStage(
+  applicationId: string,
+  newStage: string,
+): Promise<void> {
+  return tauriInvoke<void>('update_candidate_stage', { applicationId, newStage });
+}
+
+export async function getAnalyticsData(): Promise<AnalyticsData> {
+  return tauriInvoke<AnalyticsData>('get_analytics_data');
+}
+
+export async function createApplication(
+  candidateId: string,
+  jobId: string,
+): Promise<string> {
+  return tauriInvoke<string>('create_application', { candidateId, jobId });
+}
+
+export async function getJobApplications(jobId: string): Promise<PipelineCandidate[]> {
+  return tauriInvoke<PipelineCandidate[]>('get_job_applications', { jobId });
 }

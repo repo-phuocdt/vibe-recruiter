@@ -55,6 +55,7 @@
 <AppLayout
   conversations={chatStore.conversations}
   activeId={chatStore.activeConversationId}
+  showChatList={true}
   oncreate={handleCreate}
   onselect={handleSelect}
   ondelete={handleDelete}

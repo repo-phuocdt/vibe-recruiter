@@ -40,7 +40,9 @@
     "@tauri-apps/plugin-shell": "^2.3.5",
     "ai": "^6.0.97",
     "dompurify": "^3.3.1",
+    "lucide-svelte": "^0.575.0",
     "marked": "^17.0.3",
+    "svelte-dnd-action": "^0.9.69",
     "zod": "^4.3.6"
   }
 }

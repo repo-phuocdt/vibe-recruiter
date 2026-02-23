@@ -53,6 +53,13 @@ pub fn run() {
             commands::jobs::generate_report_data,
             // Embeddings
             commands::embeddings::search_similar,
+            // Analytics
+            commands::analytics::get_dashboard_stats,
+            commands::analytics::get_pipeline_candidates,
+            commands::analytics::update_candidate_stage,
+            commands::analytics::get_analytics_data,
+            commands::analytics::create_application,
+            commands::analytics::get_job_applications,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

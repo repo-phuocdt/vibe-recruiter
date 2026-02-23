@@ -74,6 +74,14 @@ const MIGRATIONS: &[Migration] = &[
             ALTER TABLE messages ADD COLUMN tool_calls TEXT;
         ",
     },
+    Migration {
+        version: 4,
+        up: "
+            CREATE INDEX IF NOT EXISTS idx_applications_status ON applications(status);
+            CREATE INDEX IF NOT EXISTS idx_applications_job_id ON applications(job_id);
+            CREATE INDEX IF NOT EXISTS idx_applications_candidate_id ON applications(candidate_id);
+        ",
+    },
 ];
 
 pub fn run_migrations(conn: &Connection) -> Result<()> {
