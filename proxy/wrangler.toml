@@ -22,5 +22,7 @@ ENVIRONMENT = "development"
 
 # Secrets (set via wrangler secret put):
 # PROXY_API_KEY
+# JWT_SECRET
 # OPENAI_API_KEY
 # ANTHROPIC_API_KEY
+# SERPER_API_KEY

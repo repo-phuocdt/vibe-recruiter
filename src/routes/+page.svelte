@@ -10,11 +10,12 @@
     setMessages,
   } from '$lib/stores/chat-store.svelte';
   import { settingsStore } from '$lib/stores/settings-store.svelte';
+  import { authStore } from '$lib/stores/auth-store.svelte';
   import { getProvider } from '$lib/services/ai-client';
   import { createChatManager } from '$lib/services/chat-manager';
 
   const chat = createChatManager(() =>
-    getProvider(settingsStore.model, settingsStore.settings)
+    getProvider(settingsStore.model, settingsStore.settings, authStore.accessToken)
   );
 
   $effect(() => {

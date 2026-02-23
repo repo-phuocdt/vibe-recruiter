@@ -96,3 +96,28 @@ export type PipelineStage = 'new' | 'screening' | 'interview' | 'offer' | 'hired
 export const PIPELINE_STAGES: PipelineStage[] = [
   'new', 'screening', 'interview', 'offer', 'hired', 'rejected',
 ];
+
+// --- Auth ---
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  plan: 'free' | 'pro';
+}
+
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+  user: AuthUser;
+}
+
+// --- Usage ---
+
+export interface UsageStats {
+  requestCount: number;
+  tokensUsed: number;
+  requestLimit: number;
+  tokenLimit: number;
+  plan: string;
+  resetDate: string;
+}

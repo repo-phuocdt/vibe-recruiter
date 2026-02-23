@@ -35,13 +35,15 @@ vibe-recruiter/
 | File | Purpose |
 |------|---------|
 | `routes/+page.svelte` | Home page (chat interface) |
-| `routes/+layout.svelte` | Root layout wrapper with sidebar-nav |
+| `routes/+layout.svelte` | Root layout wrapper with sidebar-nav, error boundary, offline banner |
 | `routes/dashboard/+page.svelte` | Dashboard overview with stats & pipeline board (Phase 4) |
 | `routes/candidates/+page.svelte` | Candidates list page |
 | `routes/candidates/[id]/+page.svelte` | Candidate detail page (Phase 4) |
 | `routes/jobs/+page.svelte` | Jobs list page |
 | `routes/jobs/[id]/+page.svelte` | Job detail page (Phase 4) |
-| `routes/settings/+page.svelte` | Settings page |
+| `routes/settings/+page.svelte` | Settings page with account & usage sections (Phase 5) |
+| `routes/auth/login/+page.svelte` | Login form (email + password) (Phase 5) |
+| `routes/auth/register/+page.svelte` | Registration form (email + password validation) (Phase 5) |
 | `routes/+layout.ts` | Layout data loading |
 
 ### Components (lib/components/)
@@ -59,6 +61,10 @@ vibe-recruiter/
 - `layout/sidebar.svelte` - Conversation list & navigation
 - `layout/sidebar-nav.svelte` - Navigation bar with route links (Phase 4)
 
+**Shared Components:**
+- `shared/error-boundary.svelte` - Catches unhandledrejection + error events globally (Phase 5)
+- `shared/offline-banner.svelte` - Shows when offline, indicates limited functionality (Phase 5)
+
 **Dashboard Module (Phase 4):**
 - `dashboard/stats-cards.svelte` - Key metrics display (total candidates, jobs, applications, hired)
 - `dashboard/candidate-pipeline-card.svelte` - Individual candidate card with drag-drop support
@@ -74,6 +80,9 @@ vibe-recruiter/
 **Jobs Module (Phase 3):**
 - `jobs/` - Job listing components
 
+**Settings Module (Phase 5):**
+- `settings/usage-display.svelte` - Monthly request/token usage with progress bars
+
 ### Stores (lib/stores/)
 | File | Purpose |
 |------|---------|
@@ -82,6 +91,7 @@ vibe-recruiter/
 | `candidates-store.svelte.ts` | Candidate state management (Phase 3) |
 | `jobs-store.svelte.ts` | Job listings state (Phase 3) |
 | `dashboard-store.svelte.ts` | Dashboard UI state with optimistic updates for pipeline management (Phase 4) |
+| `auth-store.svelte.ts` | User authentication state (login, user, tokens) with initAuth() (Phase 5) |
 
 ### Services (lib/services/)
 | File | Purpose |
@@ -91,6 +101,7 @@ vibe-recruiter/
 | `chat-manager.ts` | Streaming chat logic with agent & tool support |
 | `tauri-commands.ts` | Tauri command invocations wrapper |
 | `rag.ts` | RAG context generation for agent |
+| `auth-client.ts` | Auth API client (login, register, refresh, logout, getUsage) (Phase 5) |
 
 **Tools (lib/services/tools/):**
 - `index.ts` - Tool registry with all 6 tools
@@ -170,13 +181,23 @@ vibe-recruiter/
 
 | File | Purpose |
 |------|---------|
-| `index.ts` | Hono app with routes & model routing + web search (Phase 3) |
+| `index.ts` | Hono app with routes & model routing + web search (Phase 3) + auth routes (Phase 5) |
 | `auth-middleware.ts` | Bearer token validation (constant-time) |
 | `rate-limiter.ts` | KV-based rate limiting (60 req/min) |
+| `jwt-secret.ts` | JWT signing secret retrieval from env (Phase 5) |
+| `routes/auth.ts` | User registration, login, token refresh, logout with PBKDF2 hashing (Phase 5) |
+| `routes/usage.ts` | Monthly request/token usage tracking (GET /usage) (Phase 5) |
 
 **Routes (Phase 3):**
 - `POST /v1/chat/completions` - Chat completion with model routing
 - `POST /v1/search` - Serper.dev web search integration (requires SERPER_API_KEY)
+
+**Auth Routes (Phase 5):**
+- `POST /auth/register` - Create user account, returns JWT tokens
+- `POST /auth/login` - Authenticate user with email/password
+- `POST /auth/refresh` - Refresh expired access token using refresh token
+- `POST /auth/logout` - Revoke refresh token (best-effort)
+- `GET /usage` - Get monthly usage stats (requires authorization)
 
 ## Configuration Files
 
@@ -201,6 +222,7 @@ svelte                - Svelte 5 (runes)
 ai                    - Vercel AI SDK v6+ (streamText + tools)
 zod                   - Schema validation v4 (tool inputSchema)
 @tauri-apps/api       - Tauri frontend bridge
+@tauri-apps/plugin-store  - Encrypted token storage (.auth.dat) (Phase 5)
 dompurify             - HTML sanitization
 marked                - Markdown parser
 tailwindcss           - CSS framework v4
@@ -222,6 +244,8 @@ thiserror             - Error derive macros
 ```
 hono                  - Web framework
 @cloudflare/workers-types - CF Workers types
+jose                  - JWT signing & verification (Phase 5)
+@hono/zod-validator   - Request body validation (Phase 5)
 ```
 
 ## Data Flow Summary

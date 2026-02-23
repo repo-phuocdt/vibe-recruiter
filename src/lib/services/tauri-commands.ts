@@ -202,3 +202,17 @@ export async function createApplication(
 export async function getJobApplications(jobId: string): Promise<PipelineCandidate[]> {
   return tauriInvoke<PipelineCandidate[]>('get_job_applications', { jobId });
 }
+
+// --- Auth token store ---
+
+export async function storeAuthToken(accessToken: string, refreshToken: string): Promise<void> {
+  return tauriInvoke<void>('store_auth_token', { accessToken, refreshToken });
+}
+
+export async function getAuthToken(): Promise<{ access_token: string; refresh_token: string } | null> {
+  return tauriInvoke<{ access_token: string; refresh_token: string } | null>('get_auth_token');
+}
+
+export async function clearAuthToken(): Promise<void> {
+  return tauriInvoke<void>('clear_auth_token');
+}

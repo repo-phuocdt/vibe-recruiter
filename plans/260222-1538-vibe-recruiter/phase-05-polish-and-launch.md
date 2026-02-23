@@ -6,7 +6,7 @@
 - Refs: `@tauri-apps/plugin-updater`, `@tauri-apps/plugin-stronghold`, https://v2.tauri.app/distribute/
 
 ## Overview
-- **Priority:** P1 | **Status:** Pending | **Effort:** 2 weeks
+- **Priority:** P1 | **Status:** Complete | **Effort:** 2 weeks
 - Settings page (LLM config, theme), auth flow (JWT in Stronghold), proxy auth middleware + usage tracking, billing prep, auto-update, app packaging, error handling, perf optimization.
 
 ## Requirements

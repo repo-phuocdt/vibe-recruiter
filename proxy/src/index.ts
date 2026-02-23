@@ -3,11 +3,14 @@ import { cors } from 'hono/cors';
 import type { Context } from 'hono';
 import { authMiddleware } from './auth-middleware';
 import { rateLimiter } from './rate-limiter';
+import { authRouter } from './routes/auth';
+import { usageRouter } from './routes/usage';
 
 export interface Env {
   RATE_LIMIT: KVNamespace;
   DB: D1Database;
   PROXY_API_KEY: string;
+  JWT_SECRET: string;
   OPENAI_API_KEY: string;
   ANTHROPIC_API_KEY: string;
   SERPER_API_KEY: string;
@@ -16,6 +19,7 @@ export interface Env {
 
 export type Variables = {
   apiKey: string;
+  userId?: string;
 };
 
 type AppContext = Context<{ Bindings: Env; Variables: Variables }>;
@@ -37,9 +41,17 @@ app.get('/health', (c) => {
   return c.json({ status: 'ok', environment: c.env.ENVIRONMENT });
 });
 
+// Auth routes (no auth required)
+app.route('/auth', authRouter);
+
 // Protected routes
 app.use('/v1/*', authMiddleware);
 app.use('/v1/*', rateLimiter);
+
+// Usage stats (requires auth + rate limit)
+app.use('/usage', authMiddleware);
+app.use('/usage', rateLimiter);
+app.route('/usage', usageRouter);
 
 // Embeddings proxy (forward to OpenAI)
 app.post('/v1/embeddings', async (c) => {

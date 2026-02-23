@@ -12,6 +12,7 @@ use tauri::Manager;
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_store::Builder::new().build())
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(
@@ -27,6 +28,10 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            // Auth (token store)
+            commands::auth::store_auth_token,
+            commands::auth::get_auth_token,
+            commands::auth::clear_auth_token,
             // Conversations
             commands::conversations::create_conversation,
             commands::conversations::list_conversations,

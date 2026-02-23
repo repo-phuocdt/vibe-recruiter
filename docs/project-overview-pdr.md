@@ -39,6 +39,19 @@ Recruiters needing AI-assisted candidate management and analysis.
 - 6 analytics commands for pipeline & metrics management
 - Database indexes on applications table for performance
 
+#### Phase 5 (Completed)
+- User authentication with email + password registration & login
+- JWT-based access tokens (1h expiration) + refresh tokens (7d)
+- PBKDF2 password hashing with Web Crypto API (100K iterations)
+- Secure token storage in Tauri Plugin Store (encrypted .auth.dat)
+- Monthly usage tracking per user (requests & tokens)
+- Usage display component with progress bars
+- Auth pages: /auth/login, /auth/register
+- Settings page expanded with account & usage sections
+- Global error boundary for unhandled rejections
+- Offline banner when internet unavailable
+- Backward compatible with legacy PROXY_API_KEY
+
 ## Technical Stack
 
 | Layer | Technology | Version |
@@ -50,6 +63,8 @@ Recruiters needing AI-assisted candidate management and analysis.
 | **Backend** | Rust (Tauri commands) | 1.77.2+ |
 | **Database** | SQLite (rusqlite) | Latest |
 | **Proxy/Gateway** | CloudFlare Workers + Hono | Latest |
+| **Authentication** | JWT (jose) + PBKDF2 (Web Crypto) | Phase 5 |
+| **Token Storage** | Tauri Plugin Store (encrypted) | Phase 5 |
 | **Styling** | Tailwind CSS v4 | 4.x |
 | **Security** | DOMPurify for HTML sanitization | 3.x |
 | **Tool Validation** | Zod schema validation | v4+ |

@@ -85,6 +85,9 @@
 - `pipeline-board.svelte` - Kanban-style board with 6 stages & drag-drop (Phase 4)
 - `candidate-pipeline-card.svelte` - Individual candidate card in pipeline (Phase 4)
 - `simple-bar-chart.svelte` - Bar chart for analytics visualization (Phase 4)
+- `error-boundary.svelte` - Global error handler (catches unhandledrejection + error events) (Phase 5)
+- `offline-banner.svelte` - Shows when offline, disables chat/AI features (Phase 5)
+- `usage-display.svelte` - Displays monthly request/token usage with progress bars (Phase 5)
 
 **Stores (Svelte 5 Runes):**
 - `chat-store.svelte.ts` - Reactive state for conversations & messages
@@ -92,6 +95,7 @@
 - `candidates-store.svelte.ts` - Candidate state management (Phase 3)
 - `jobs-store.svelte.ts` - Job listings state (Phase 3)
 - `dashboard-store.svelte.ts` - Dashboard UI state with optimistic updates for drag-drop pipeline (Phase 4)
+- `auth-store.svelte.ts` - Authentication state (user, tokens, login status) (Phase 5)
 
 **Services:**
 - `ai-client.ts` - LLM provider factory (OpenAI-compatible)
@@ -99,6 +103,7 @@
 - `chat-manager.ts` - Streaming chat + tools via runAgent()
 - `rag.ts` - RAG context generation (Phase 3)
 - `tauri-commands.ts` - Tauri command invocations wrapper
+- `auth-client.ts` - Auth API client (login, register, refresh, logout, usage) (Phase 5)
 - `tools/` - Tool definitions with Zod schemas (Phase 3)
   - `search-candidates.ts` - Vector similarity search
   - `rank-candidates.ts` - Ranking by job relevance
@@ -142,13 +147,18 @@ All commands return `Result<T, AppError>` for error handling, parameters validat
 
 **Middleware Stack:**
 1. CORS - Allows Tauri localhost origins
-2. Auth - Validates Bearer token with constant-time comparison
+2. Auth - JWT bearer token OR legacy PROXY_API_KEY (constant-time comparison)
 3. Rate Limiter - KV-based tracking (60 req/min)
 
 **Routes:**
 - `GET /health` - No auth required, returns environment status
 - `POST /v1/chat/completions` - Model-aware routing (chat completions)
 - `POST /v1/search` - Web search endpoint (Phase 3, SERPER_API_KEY)
+- `POST /auth/register` - Create new user account with email + password (Phase 5)
+- `POST /auth/login` - Authenticate user, returns JWT tokens (Phase 5)
+- `POST /auth/refresh` - Refresh expired access token (Phase 5)
+- `POST /auth/logout` - Revoke refresh token (Phase 5)
+- `GET /usage` - Return monthly usage stats for authenticated user (Phase 5)
 
 **Model Routing Logic:**
 - Detect model name (contains 'claude' → Anthropic)
@@ -160,7 +170,86 @@ All commands return `Result<T, AppError>` for error handling, parameters validat
 - Proxies search query to Serper.dev API
 - Returns structured search results to agent tools
 
+**Authentication System (Phase 5):**
+- User accounts stored in Cloudflare D1 database (proxy)
+- Password hashing: PBKDF2 with SHA-256 (100,000 iterations) via Web Crypto API
+- JWT signing: HS256 with JWT_SECRET (required env var on proxy)
+- Access token: 1 hour expiration (contains user id, email, plan)
+- Refresh token: 7 day expiration (stored in KV cache for revocation)
+- Backward compatible: accepts JWT OR legacy PROXY_API_KEY
+- Soft auth guard: initAuth() on app mount, silent failure if proxy unavailable
+
 ## Data Flow
+
+### JWT Authentication Flow (Phase 5)
+
+```
+User Registration/Login
+    ↓
+Frontend: /auth/login or /auth/register page
+    ↓
+POST /auth/register or /auth/login with email + password
+    ↓
+Proxy: Validate email format, hash password (PBKDF2)
+    ↓
+DB: Check user exists (login) or insert new user (register)
+    ↓
+Generate JWT tokens: accessToken (1h) + refreshToken (7d)
+    ↓
+Store refreshToken in KV cache (for revocation tracking)
+    ↓
+Return { accessToken, refreshToken, user: {id, email, plan} }
+    ↓
+Frontend: storeAuthToken() → Tauri Plugin Store (.auth.dat, encrypted)
+    ↓
+Update authStore → isAuthenticated = true
+    ↓
+
+Token Usage (Chat/API Calls)
+    ↓
+Include Authorization: Bearer {accessToken} in requests
+    ↓
+Proxy middleware: jwtVerify() against JWT_SECRET
+    ↓
+Extract userId from JWT payload
+    ↓
+Forward request with userId context
+    ↓
+
+Token Refresh (when access token expires)
+    ↓
+Frontend: POST /auth/refresh with refreshToken
+    ↓
+Proxy: Verify refreshToken against KV stored token
+    ↓
+Generate new accessToken (same user, plan)
+    ↓
+Return new accessToken
+    ↓
+Frontend: Update stored token, continue request
+    ↓
+
+Logout
+    ↓
+DELETE refreshToken from KV cache (revocation)
+    ↓
+Frontend: clearAuthToken() → remove from Tauri Plugin Store
+    ↓
+Update authStore → isAuthenticated = false
+    ↓
+
+Token Storage (Frontend)
+    ↓
+Tauri Plugin Store: .auth.dat file (encrypted)
+    ↓
+Contains: { accessToken, refreshToken }
+    ↓
+Persists across app restarts
+    ↓
+initAuth() on mount attempts token refresh
+    ↓
+Silent failure: stays logged out if refresh fails
+```
 
 ### Chat Message Flow with Tools (Phase 3)
 

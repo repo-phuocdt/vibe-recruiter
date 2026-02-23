@@ -40,7 +40,7 @@ Tauri Desktop App
 | 2 | Data Management & RAG | Complete | 3w | [phase-02](./phase-02-data-and-rag.md) |
 | 3 | Agent Tools | Complete | 2w | [phase-03](./phase-03-agent-tools.md) |
 | 4 | Dashboard | Complete | 2w | [phase-04](./phase-04-dashboard.md) |
-| 5 | Polish & Launch | Pending | 2w | [phase-05](./phase-05-polish-and-launch.md) |
+| 5 | Polish & Launch | Complete | 2w | [phase-05](./phase-05-polish-and-launch.md) |
 
 ## Key Dependencies
 
