@@ -16,16 +16,17 @@ pub fn init_db(app: &tauri::App) -> Result<Connection, AppError> {
 
     std::fs::create_dir_all(&app_dir)?;
 
+    // sqlite3_auto_extension must be called BEFORE Connection::open — it registers
+    // the extension globally so it is loaded into every subsequently opened connection.
+    let vec_available = load_sqlite_vec();
+    if let Err(ref e) = vec_available {
+        log::warn!("sqlite-vec not available: {e}");
+    }
+
     let db_path = app_dir.join("vibe-recruiter.db");
     let conn = Connection::open(&db_path)?;
 
     conn.execute_batch("PRAGMA foreign_keys = ON;")?;
-
-    // Load sqlite-vec extension before migrations (needed for vec0 tables)
-    let vec_available = load_sqlite_vec(&conn);
-    if let Err(ref e) = vec_available {
-        log::warn!("sqlite-vec not available: {e}");
-    }
 
     migrations::run_migrations(&conn)?;
 
@@ -42,7 +43,7 @@ pub fn init_db(app: &tauri::App) -> Result<Connection, AppError> {
     Ok(conn)
 }
 
-fn load_sqlite_vec(_conn: &Connection) -> Result<(), AppError> {
+fn load_sqlite_vec() -> Result<(), AppError> {
     // SAFETY: sqlite3_vec_init is a valid SQLite extension entry point with the
     // correct signature for sqlite3_auto_extension. The transmute converts the
     // function pointer to the type expected by the FFI binding.

@@ -12,7 +12,7 @@
   import { settingsStore } from '$lib/stores/settings-store.svelte';
   import { authStore } from '$lib/stores/auth-store.svelte';
   import { getProvider } from '$lib/services/ai-client';
-  import { createChatManager } from '$lib/services/chat-manager';
+  import { createChatManager } from '$lib/services/chat-manager.svelte';
 
   const chat = createChatManager(() =>
     getProvider(settingsStore.model, settingsStore.settings, authStore.accessToken)
