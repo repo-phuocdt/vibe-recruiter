@@ -15,35 +15,40 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild"
-    ]
+    ],
+    "overrides": {
+      "@ai-sdk/provider-utils@4": "^4.0.33",
+      "@sveltejs/kit>cookie": "^0.7.0",
+      "@tailwindcss/typography>postcss-selector-parser": "^6.1.5"
+    }
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.10",
-    "@sveltejs/kit": "^2.53.0",
+    "@sveltejs/kit": "^2.70.2",
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.0",
     "@tauri-apps/cli": "^2.10.0",
     "@types/dompurify": "^3.2.0",
     "eslint": "^10.0.1",
-    "svelte": "^5.53.2",
+    "svelte": "^5.55.7",
     "svelte-check": "^4.4.3",
     "tailwindcss": "^4.2.0",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.7"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.46",
     "@ai-sdk/openai": "^3.0.30",
     "@ai-sdk/svelte": "^4.0.97",
-    "@tauri-apps/api": "^2.10.1",
+    "@tauri-apps/api": "~2.11.0",
     "@tauri-apps/plugin-dialog": "^2.6.0",
     "@tauri-apps/plugin-shell": "^2.3.5",
     "ai": "^6.0.97",
-    "dompurify": "^3.3.1",
+    "dompurify": "^3.4.17",
     "lucide-svelte": "^0.575.0",
     "marked": "^17.0.3",
     "svelte-dnd-action": "^0.9.69",
-    "zod": "^4.3.6"
+    "zod": "^4.6.6"
   }
 }
